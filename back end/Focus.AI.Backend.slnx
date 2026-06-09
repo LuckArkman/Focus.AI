@@ -4,4 +4,5 @@
   <Project Path="Focus.AI.Application/Focus.AI.Application.csproj" />
   <Project Path="Focus.AI.Domain/Focus.AI.Domain.csproj" />
   <Project Path="Focus.AI.Infrastructure/Focus.AI.Infrastructure.csproj" />
+  <Project Path="Focus.AI.IntegrationTests/Focus.AI.IntegrationTests.csproj" />
 </Solution>

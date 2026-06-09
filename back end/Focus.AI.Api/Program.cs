@@ -3,6 +3,8 @@ using Focus.AI.Domain;
 using Focus.AI.Infrastructure;
 using MediatR;
 using Focus.AI.Application.Commands.Ping;
+using Focus.AI.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +15,18 @@ builder.Services.AddSwaggerGen();
 // DI Orchestration (Clean Architecture)
 builder.Services.AddDomain();
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    if (app.Environment.IsDevelopment())
+    {
+        await dbContext.Database.MigrateAsync();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
