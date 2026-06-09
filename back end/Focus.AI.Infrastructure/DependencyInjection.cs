@@ -22,6 +22,10 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
+        services.Configure<MongoDbSettings>(configuration.GetSection(MongoDbSettings.SectionName));
+        services.AddSingleton<MongoDbContext>();
+        services.AddScoped<IChatSessionRepository, ChatSessionRepository>();
+
         return services;
     }
 }
