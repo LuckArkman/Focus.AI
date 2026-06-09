@@ -6,6 +6,7 @@ using Focus.AI.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Qdrant.Client;
 
 namespace Focus.AI.Infrastructure;
 
@@ -25,6 +26,13 @@ public static class DependencyInjection
         services.Configure<MongoDbSettings>(configuration.GetSection(MongoDbSettings.SectionName));
         services.AddSingleton<MongoDbContext>();
         services.AddScoped<IChatSessionRepository, ChatSessionRepository>();
+
+        // Qdrant
+        var qdrantUrl = configuration.GetConnectionString("Qdrant");
+        var uri = new Uri(qdrantUrl!);
+        services.AddSingleton(new QdrantClient(uri.Host, uri.Port));
+        services.AddHostedService<QdrantInitializer>();
+        services.AddScoped<Focus.AI.Application.Interfaces.IVectorMemoryRepository, VectorMemoryRepository>();
 
         return services;
     }
