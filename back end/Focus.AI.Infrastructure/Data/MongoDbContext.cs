@@ -15,6 +15,10 @@ public class MongoDbContext
 
     static MongoDbContext()
     {
+        var objectSerializer = new ObjectSerializer(type => ObjectSerializer.DefaultAllowedTypes(type));
+        BsonSerializer.RegisterSerializer(objectSerializer);
+        BsonSerializer.RegisterSerializer(new GuidSerializer(MongoDB.Bson.GuidRepresentation.Standard));
+
         BsonClassMap.RegisterClassMap<ChatSession>(cm =>
         {
             cm.AutoMap();

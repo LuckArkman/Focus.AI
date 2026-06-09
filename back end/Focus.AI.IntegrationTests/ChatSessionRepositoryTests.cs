@@ -41,10 +41,8 @@ public class ChatSessionRepositoryTests : IAsyncLifetime
     public async Task CreateSessionAndAddMessages_WorksCorrectly()
     {
         // Arrange
-        var sessionId = Guid.NewGuid().ToString();
         var session = new ChatSession
         {
-            Id = sessionId,
             UserId = Guid.NewGuid(),
             ProjectId = Guid.NewGuid(),
             CreatedAt = DateTime.UtcNow
@@ -52,6 +50,7 @@ public class ChatSessionRepositoryTests : IAsyncLifetime
 
         // Act
         await _repository.CreateSessionAsync(session);
+        var sessionId = session.Id;
 
         var msg1 = new ChatMessage { SessionId = sessionId, Role = "User", Content = "Hello", Timestamp = DateTime.UtcNow.AddMinutes(-5) };
         var msg2 = new ChatMessage { SessionId = sessionId, Role = "Assistant", Content = "Hi there!", Timestamp = DateTime.UtcNow.AddMinutes(-4) };
@@ -71,9 +70,9 @@ public class ChatSessionRepositoryTests : IAsyncLifetime
     public async Task GetSessionHistoryAsync_LimitsToLastNMessages()
     {
         // Arrange
-        var sessionId = Guid.NewGuid().ToString();
-        var session = new ChatSession { Id = sessionId, UserId = Guid.NewGuid() };
+        var session = new ChatSession { UserId = Guid.NewGuid() };
         await _repository.CreateSessionAsync(session);
+        var sessionId = session.Id;
 
         for (int i = 0; i < 5; i++)
         {
