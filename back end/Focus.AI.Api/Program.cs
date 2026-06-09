@@ -3,14 +3,35 @@ using Focus.AI.Domain;
 using Focus.AI.Infrastructure;
 using MediatR;
 using Focus.AI.Application.Commands.Ping;
+using Focus.AI.Application.Commands.Auth.Register;
+using Focus.AI.Application.Queries.Auth.Login;
 using Focus.AI.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
+        };
+    });
+builder.Services.AddAuthorization();
 
 // DI Orchestration (Clean Architecture)
 builder.Services.AddDomain();
@@ -36,6 +57,25 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Auth Endpoints
+app.MapPost("/api/auth/register", async (RegisterUserCommand command, IMediator mediator) =>
+{
+    var result = await mediator.Send(command);
+    return Results.Ok(new { userId = result });
+})
+.WithName("Register")
+.WithOpenApi();
+
+app.MapPost("/api/auth/login", async (LoginQuery query, IMediator mediator) =>
+{
+    var token = await mediator.Send(query);
+    return Results.Ok(new { token });
+})
+.WithName("Login")
+.WithOpenApi();
 
 // Exemplos Práticos
 app.MapPost("/ping", async (PingCommand command, IMediator mediator) =>
@@ -44,6 +84,7 @@ app.MapPost("/ping", async (PingCommand command, IMediator mediator) =>
     return Results.Ok(new { message = result });
 })
 .WithName("PingEndpoint")
+.RequireAuthorization()
 .WithOpenApi();
 
 app.Run();

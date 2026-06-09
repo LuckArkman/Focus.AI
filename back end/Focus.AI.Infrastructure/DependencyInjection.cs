@@ -1,4 +1,6 @@
+using Focus.AI.Application.Interfaces.Authentication;
 using Focus.AI.Domain.Interfaces;
+using Focus.AI.Infrastructure.Authentication;
 using Focus.AI.Infrastructure.Data;
 using Focus.AI.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,10 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
         return services;
     }
