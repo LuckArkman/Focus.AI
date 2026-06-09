@@ -10,12 +10,29 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Serilog;
+using Serilog.Formatting.Compact;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithThreadId()
+    .Enrich.WithMachineName()
+    .WriteTo.Console()
+    .WriteTo.File(new CompactJsonFormatter(), "logs/focus-api-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddExceptionHandler<Focus.AI.Api.ExceptionHandlers.GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -57,8 +74,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/api/test-crash", () => {
+    throw new NullReferenceException("This is a deliberate crash for testing the global exception handler.");
+})
+.ExcludeFromDescription(); // Ocultar do swagger principal ou deixar .WithOpenApi()
+
 
 // Auth Endpoints
 app.MapPost("/api/auth/register", async (RegisterUserCommand command, IMediator mediator) =>
