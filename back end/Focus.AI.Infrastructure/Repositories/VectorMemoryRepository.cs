@@ -16,10 +16,13 @@ public class VectorMemoryRepository : IVectorMemoryRepository
 
     public async Task UpsertInteractionVectorAsync(Guid userId, string sessionId, string rawText, float[] vector)
     {
+        var qdrantVector = new Vector();
+        qdrantVector.Data.AddRange(vector);
+
         var point = new PointStruct
         {
             Id = Guid.NewGuid(),
-            Vectors = vector,
+            Vectors = new Vectors { Vector = qdrantVector },
             Payload =
             {
                 ["user_id"] = userId.ToString(),
