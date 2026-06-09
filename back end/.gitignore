@@ -1,0 +1,14 @@
+# .NET Core
+bin/
+obj/
+*.user
+*.suo
+
+# Mac/OSX
+.DS_Store
+
+# ONNX Models (To prevent pushing 20GB files)
+*.onnx
+*.onnx.data
+*.bin
+models/

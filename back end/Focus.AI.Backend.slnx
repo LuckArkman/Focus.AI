@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Focus.AI.Api/Focus.AI.Api.csproj" />
+  <Project Path="Focus.AI.Application/Focus.AI.Application.csproj" />
+  <Project Path="Focus.AI.Domain/Focus.AI.Domain.csproj" />
+  <Project Path="Focus.AI.Infrastructure/Focus.AI.Infrastructure.csproj" />
+</Solution>
