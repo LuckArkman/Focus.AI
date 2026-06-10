@@ -1,0 +1,6 @@
+namespace Focus.AI.Application.Interfaces.Services;
+
+public interface IEmbeddingGenerator
+{
+    Task<float[]> GenerateEmbeddingAsync(string text, CancellationToken cancellationToken = default);
+}

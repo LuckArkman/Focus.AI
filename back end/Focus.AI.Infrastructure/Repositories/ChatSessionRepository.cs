@@ -16,6 +16,10 @@ public class ChatSessionRepository : IChatSessionRepository
 
     public async Task<ChatSession> CreateSessionAsync(ChatSession session, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrEmpty(session.Id))
+        {
+            session.Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
+        }
         await _sessions.InsertOneAsync(session, cancellationToken: cancellationToken);
         return session;
     }
@@ -40,5 +44,17 @@ public class ChatSessionRepository : IChatSessionRepository
         }
 
         return session.Messages.OrderBy(m => m.Timestamp);
+    }
+
+    public async Task<IEnumerable<ChatSession>> GetSessionsByProjectIdAsync(Guid projectId, CancellationToken cancellationToken = default)
+    {
+        var filter = Builders<ChatSession>.Filter.Eq(s => s.ProjectId, projectId);
+        // Exclude messages from the projection to keep it lightweight when fetching session headers
+        var projection = Builders<ChatSession>.Projection.Exclude(s => s.Messages);
+        
+        return await _sessions.Find(filter)
+            .Project<ChatSession>(projection)
+            .SortByDescending(s => s.CreatedAt)
+            .ToListAsync(cancellationToken);
     }
 }

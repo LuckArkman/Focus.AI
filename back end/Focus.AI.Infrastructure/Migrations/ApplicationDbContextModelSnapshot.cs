@@ -22,6 +22,41 @@ namespace Focus.AI.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Focus.AI.Domain.Entities.Project", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LanguageStack")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LocalPath")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "LocalPath")
+                        .IsUnique();
+
+                    b.ToTable("Projects");
+                });
+
             modelBuilder.Entity("Focus.AI.Domain.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -80,6 +115,17 @@ namespace Focus.AI.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Focus.AI.Domain.Entities.Project", b =>
+                {
+                    b.HasOne("Focus.AI.Domain.Entities.User", "User")
+                        .WithMany("Projects")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Focus.AI.Domain.Entities.User", b =>
                 {
                     b.HasOne("Focus.AI.Domain.Entities.Role", "Role")
@@ -89,6 +135,11 @@ namespace Focus.AI.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Focus.AI.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618
         }

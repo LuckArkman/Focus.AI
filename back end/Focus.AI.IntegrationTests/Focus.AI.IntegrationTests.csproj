@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="FluentAssertions" Version="8.10.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
@@ -30,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Focus.AI.Infrastructure\Focus.AI.Infrastructure.csproj" />
     <ProjectReference Include="..\Focus.AI.Domain\Focus.AI.Domain.csproj" />
+    <ProjectReference Include="..\Focus.AI.Api\Focus.AI.Api.csproj" />
   </ItemGroup>
 
 </Project>

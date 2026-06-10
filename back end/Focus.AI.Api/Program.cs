@@ -29,9 +29,12 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<Focus.AI.Application.Interfaces.Authentication.ICurrentUserContext, Focus.AI.Api.Services.CurrentUserContext>();
 builder.Services.AddSignalR();
 
 builder.Services.AddExceptionHandler<Focus.AI.Api.ExceptionHandlers.GlobalExceptionHandler>();
@@ -71,6 +74,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddDomain();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// AI Services
+builder.Services.AddHostedService<Focus.AI.Infrastructure.Services.ModelDownloaderService>();
+builder.Services.AddSingleton<Focus.AI.Application.Interfaces.Services.IEmbeddingGenerator, Focus.AI.Infrastructure.Services.LocalEmbeddingGenerator>();
 
 var app = builder.Build();
 
@@ -131,3 +138,5 @@ app.MapPost("/ping", async (PingCommand command, IMediator mediator) =>
 .WithOpenApi();
 
 app.Run();
+
+public partial class Program { }

@@ -10,4 +10,5 @@ public class User
     public bool IsActive { get; set; }
     public Guid RoleId { get; set; }
     public Role Role { get; set; } = null!;
+    public ICollection<Project> Projects { get; set; } = new List<Project>();
 }
